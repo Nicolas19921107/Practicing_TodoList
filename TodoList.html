@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./bootstrap-4.2.1-dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="./fontawesome-free-5.15.4-web/css/all.css" />
+    <link rel="stylesheet" href="./todolist.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <nav class="navbar navbar-light bg-light">
+      <a class="navbar-brand">Navbar</a>
+      <form class="form-inline w-75">
+        <input
+          class="form-control mr-sm-2 w-50"
+          type="search"
+          placeholder="Search"
+          aria-label="Search"
+        />
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">
+          Search
+        </button>
+      </form>
+    </nav>
+
+    <!-- 代辦事項輸入區 -->
+    <div class="container todoinput px-0">
+      <div class="d-flex justify-content-between my-3">
+        <div class="w-75 mb-0">
+          <input
+            type="text"
+            class="form-contro w-100 h-100"
+            id="TodoitemTitle"
+            name="TodoitemTitle"
+            placeholder="請輸入代辦事項標題"
+          />
+        </div>
+        <div class="w-75 mb-0">
+          <input
+            type="text"
+            class="form-contro w-100 h-100"
+            id="Todoitem"
+            name="Todoitem"
+            aria-describedby="emailHelp"
+            placeholder="請輸入代辦事項"
+          />
+        </div>
+        <button class="btnsubmit btn-primary w-50 h-100 mx-2 px-0">送出</button>
+        <button class="btnclear btn-danger w-50 h-100 mx-2 px-0">
+          清除所有資料
+        </button>
+      </div>
+    </div>
+
+    <!-- 代辦事項顯示區 -->
+    <ul class="container todolist my-3"></ul>
+
+    <!-- Modal 編輯代辦事項 -->
+    <div
+      class="modal fade"
+      id="exampleModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">編輯代辦事項</h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <label>代辦事項標題</label>
+            <input
+              type="text"
+              class="form-contro w-100 h-100"
+              id="TodoitemTitle"
+              name="TodoitemTitle"
+              placeholder="請輸入代辦事項標題"
+            />
+            <label>代辦事項內容</label>
+            <input
+              type="text"
+              class="form-contro w-100 h-100"
+              id="Todoitem"
+              name="Todoitem"
+              aria-describedby="emailHelp"
+              placeholder="請輸入代辦事項"
+            />
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              取消
+            </button>
+            <button type="button" class="btn confirm btn-primary">確認</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // 暫存新增代辦事項的陣列
+      let todocontent = [];
+
+      // 編輯代辦事項的變數
+      let ChangePos, ChangeTitle, ChangeContent;
+
+      // 讀入暫存 LocalStorage 的代辦事項
+      let TodoList = JSON.parse(localStorage.getItem("代辦事項"));
+
+      // 每次載入時直接讀取代辦事項清單
+      (function () {
+        // 如果沒有代辦事項就顯示 目前無內容
+        TodoList && TodoList.length !== 0
+          ? TodoList.map((v, i) => {
+              // 新增 li 元素
+              let NewItem = document.createElement("li");
+              // 新增 li 的 class
+              NewItem.classList.add(
+                "content",
+                "d-flex",
+                "justify-content-between",
+                "my-3",
+                "p-3"
+              );
+
+              // 再新增一個 id (識別用)
+              NewItem.setAttribute("id", v.id);
+
+              // 顯示前端內容
+              NewItem.innerHTML = `<div class="content-body">
+            <h5 class="content-title">${v.title}</h5>
+            <p class="content-text">
+              ${v.content}
+            </p>
+          </div>
+          <div class="content-button my-3">
+            <i class="fas fa-edit mx-2" data-toggle="modal"
+        data-target="#exampleModal"></i>
+            <i class="fas fa-trash-alt mx-2"></i>
+            <i class="far fa-check-circle mx-2"></i>
+          </div>`;
+
+              // 新增一個 childNode 到 todolist 裡
+              document.querySelector(".todolist").appendChild(NewItem);
+            })
+          : (document.querySelector(".todolist").innerHTML =
+              "<div class=noContent><h1>代辦事項目前無內容</h1></div>");
+      })();
+
+      // 點擊 送出 按鈕
+      document
+        .querySelector(".btnsubmit")
+        .addEventListener("click", function () {
+          // 新增代辦事項的 函式
+          Additem();
+        });
+
+      // Enter 鈕送出
+      document
+        .querySelector(".btnsubmit")
+        .addEventListener("keypress", function (e) {
+          e.which === 13 ? Additem() : console.log("沒被點擊");
+        });
+
+      // 清除 LocalStorage
+      document
+        .querySelector(".btnclear")
+        .addEventListener("click", function () {
+          localStorage.removeItem("代辦事項");
+          document.querySelector(".todolist").innerHTML =
+            "<div class=noContent><h1>代辦事項目前無內容</h1></div>";
+        });
+
+      // 刪除單一事項 與 編輯單一事項
+      document
+        .querySelector(".todolist")
+        .addEventListener("click", function (event) {
+          // 抓取事件所處的 DOM
+          let Beclick = event.target;
+          let BeclickParent = Beclick.parentNode.parentNode;
+          // 抓取代辦事項的 LocalStorage
+          let TodoList = JSON.parse(localStorage.getItem("代辦事項"));
+
+          // 如果點擊刪除 icon
+          if (Beclick.classList.contains("fa-trash-alt")) {
+            // 抓取該事項在 LocalStorage 的索引
+            const TodolistIndex = TodoList.findIndex((e) => {
+              return e.id === parseInt(Beclick.parentNode.parentNode.id);
+            });
+
+            // 從前端畫面移除
+            BeclickParent.remove();
+
+            // 從 LocalStorage 移除
+            TodoList.splice(TodolistIndex, 1);
+
+            // 更新 LocalStorage
+            localStorage.setItem("代辦事項", JSON.stringify(TodoList));
+          }
+
+          // 如果點擊完成的 icon
+          if (Beclick.classList.contains("fa-check-circle")) {
+            // 新增完成的 icon 顏色
+            if (Beclick.getAttribute("class") == "far fa-check-circle mx-2") {
+              Beclick.setAttribute(
+                "class",
+                "far fa-check-circle mx-2 checkcomplete"
+              );
+            }
+            // 再點一次取消完成，回復預設顏色
+            else {
+              Beclick.setAttribute("class", "far fa-check-circle mx-2");
+            }
+          }
+
+          // 如果點擊編輯 icon
+          if (Beclick.classList.contains("fa-edit")) {
+            // 抓取編輯事項的 id
+            ChangePos = BeclickParent.getAttribute("id");
+
+            // 抓取編輯事項的標題
+            ChangeTitle = BeclickParent.childNodes[0].childNodes[1];
+
+            // 抓取編輯事項的內容
+            ChangeContent = BeclickParent.childNodes[0].childNodes[3];
+
+            // 讀取原本的標題內容，顯示在輸入框
+            let Title = BeclickParent.querySelector(".content-title").innerText;
+
+            // 讀取原本的內文，顯示在輸入框
+            let Content =
+              Beclick.parentNode.parentNode.querySelector(
+                ".content-text"
+              ).innerText;
+            document.querySelector(".modal-body #TodoitemTitle").value = Title;
+            document.querySelector(".modal-body #Todoitem").value = Content;
+          }
+        });
+
+      // 編輯後點選確認鈕
+      document.querySelector(".confirm").addEventListener("click", function () {
+        // 讀取 LocalStorage 的內容
+        let TodoList = JSON.parse(localStorage.getItem("代辦事項"));
+
+        // 抓取該事項在 LocalStorage 的索引
+        const TodolistIndex = TodoList.findIndex((e) => {
+          return e.id === parseInt(ChangePos);
+        });
+
+        // 更新在 LocalStorage 的標題
+        TodoList[TodolistIndex].title = document.querySelector(
+          ".modal-body #TodoitemTitle"
+        ).value;
+
+        // 更新在 LocalStorage 的內文
+        TodoList[TodolistIndex].content = document.querySelector(
+          ".modal-body #Todoitem"
+        ).value;
+        localStorage.setItem("代辦事項", JSON.stringify(TodoList));
+
+        // 同步更新到前端畫面
+        ChangeTitle.innerHTML = TodoList[TodolistIndex].title;
+        ChangeContent.innerHTML = TodoList[TodolistIndex].content;
+
+        // 關閉 Modal
+        $("#exampleModal").modal("hide");
+      });
+
+      // 新增代辦事項的 函式
+      function Additem() {
+        // 隨機生成 id Number
+        let idLength = Math.floor(Math.random() * 1000);
+        let Title = document.querySelector("#TodoitemTitle").value;
+        let Content = document.querySelector("#Todoitem").value;
+        document.querySelector(".noContent").innerHTML = "";
+
+        // 新增一個 li 元素
+        let NewItem = document.createElement("li");
+
+        // 新增代辦事項到暫存陣列中
+        todocontent.push({
+          id: idLength,
+          title: Title,
+          content: Content,
+        });
+
+        // 新增 li 的 class
+        NewItem.classList.add(
+          "content",
+          "d-flex",
+          "justify-content-between",
+          "my-3"
+        );
+
+        // 新增代辦事項的 id 屬性
+        NewItem.setAttribute("id", idLength);
+
+        // 新增前端畫面
+        NewItem.innerHTML = `<div class="content-body">
+            <h5 class="content-title">${Title}</h5>
+            <p class="content-text">
+              ${Content}
+            </p>
+          </div>
+          <div class="content-button my-3">
+            <i class="fas fa-edit mx-2" data-toggle="modal"
+        data-target="#exampleModal"></i>
+            <i class="fas fa-trash-alt mx-2"></i>
+            <i class="far fa-check-circle mx-2"></i>
+          </div>`;
+
+        // 新增一個 childNode
+        document.querySelector(".todolist").appendChild(NewItem);
+
+        // 清空輸入框的值
+        document.querySelector("#TodoitemTitle").value = "";
+        document.querySelector("#Todoitem").value = "";
+
+        // 更新 LocalStorage
+        localStorage.setItem("代辦事項", JSON.stringify(todocontent));
+      }
+
+      class Item {
+        constructor() {}
+      }
+    </script>
+    <!-- JQ 要放 JS 前面 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.js"></script>
+    <script src="./bootstrap-4.2.1-dist/js/bootstrap.js"></script>
+  </body>
+</html>
