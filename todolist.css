@@ -1,9 +1,15 @@
+body {
+  background-color: #4b4b4b;
+}
 .todolist {
-  border: 1px solid #000000;
+  border: 3px dashed #fc8f00;
+  border-radius: 10px;
 }
 
 .content {
-  border: 1px solid #000000;
+  border: 2px dashed #ffffff;
+  border-radius: 10px;
+  color: #ffffff;
 }
 
 .content-text {
@@ -13,6 +19,76 @@
   font-size: 30px;
 }
 
+.content-body h4 {
+  font-weight: 900;
+}
+
 .checkcomplete {
   color: #00ff00;
+}
+
+.btnsubmit {
+  border-radius: 10px;
+  border: transparent;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.btnclear {
+  border-radius: 10px;
+  border: transparent;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.modal-header {
+  border-bottom: 3px dotted #ffffff;
+}
+
+.modal-content {
+  border-radius: 10px;
+  border: 1px solid #ff0000;
+  background-color: #ffc559;
+}
+
+.modal-title {
+  font-size: 25px;
+  font-weight: 700;
+}
+
+span {
+  font-size: 30px;
+  color: #000000;
+}
+
+.modal-body label {
+  font-size: 18px;
+  font-weight: 700;
+  margin-top: 10px;
+}
+
+.modal-body input {
+  border-radius: 10px;
+  padding: 10px 10px;
+}
+
+.modal-footer button {
+  font-size: 20px;
+  font-weight: 700;
+  border-radius: 20px;
+}
+
+.fa-edit {
+  color: rgb(173, 215, 255);
+}
+
+.fa-trash-alt {
+  color: rgb(255, 110, 110);
+}
+
+.noContent h1 {
+  color: #ffffff;
+  font-weight: 700;
+  text-align: center;
+  margin: 10px 0;
 }
